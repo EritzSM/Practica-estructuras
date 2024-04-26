@@ -5,7 +5,33 @@ class GestorLibros:
         self.ingreso_total = 0
 
     def agregar_libro(self, libro):
-        self.biblioteca.append(libro)
+        current = self.biblioteca.head
+                                                                                                                            # V
+        while current:
+            if current.value.numero_libro == libro.numero_libro:
+                print("Este libro ya existe en la biblioteca.")
+                return
+            current = current.next
+
+                                                                                                                            # B
+        current = self.biblioteca.head
+        Ultimo_libro_por_genero = None
+        while current:
+            if current.value.genero == libro.genero:
+                Ultimo_libro_por_genero = current
+            current = current.next
+
+                                                                                                                            # I
+        if Ultimo_libro_por_genero:
+            new_node = Node(libro)
+            new_node.next = Ultimo_libro_por_genero.next
+            Ultimo_libro_por_genero.next = new_node
+            if Ultimo_libro_por_genero == self.biblioteca.tail:
+                self.biblioteca.tail = new_node
+        else:
+            self.biblioteca.append(libro)
+
+        print("Libro agregado correctamente.")
 
     def eliminar_libro(self, numero_libro):
         current = self.biblioteca.head
@@ -22,8 +48,7 @@ class GestorLibros:
             current = current.next
         return False
 
-
-    def buscar_por_genero(self, genero):
+    def buscar_por_genero(self, genero): 
         libros_encontrados = LinkedList()  
         cantidad = 0
         current = self.biblioteca.head
@@ -34,7 +59,6 @@ class GestorLibros:
             current = current.next
         return cantidad, libros_encontrados
 
-
     def buscar_por_titulo(self, titulo):
         current = self.biblioteca.head
         while current:
@@ -43,22 +67,22 @@ class GestorLibros:
             current = current.next
         return None, "No se encontró el libro"
 
-
     def buscar_por_autor(self, autor):
+        libros_encontrados = LinkedList()  
         current = self.biblioteca.head
         while current:
-            if current.value.autor == autor:
-                return current.value, "Disponible" if current.value.disponible else "No disponible"
+            if current.value.autor == autor: 
+                libros_encontrados.append(current.value)  
             current = current.next
-        return None, "No se encontró el libro"
+        return libros_encontrados
 
     def buscar_por_ano_publicacion(self, ano_publicacion):
+        libros_encontrados = LinkedList()  
         current = self.biblioteca.head
         while current:
             if current.value.ano_publicacion == ano_publicacion:
-                return current.value, "Disponible" if current.value.disponible else "No disponible"
-            current = current.next
-        return None, "No se encontró el libro"
+                libros_encontrados.append(current.value)  
+            return libros_encontrados
 
     def listar_disponibles(self):
         current = self.biblioteca.head
@@ -87,7 +111,6 @@ class GestorLibros:
             current = current.next
         return libros_disponibles
 
-
     def listar_alquilados_por_genero(self, genero):
         libros_alquilados = LinkedList() 
         current = self.biblioteca.head
@@ -97,18 +120,28 @@ class GestorLibros:
             current = current.next
         return libros_alquilados
 
-
     def alquilar_libro_por_genero(self, genero):
-        libros_disponibles = self.listar_disponibles_por_genero(genero)
-        if libros_disponibles:
-            for libro in libros_disponibles:
-                if libro.disponible:
-                    libro.disponible = False
-                    return True, libro
-            return False, "No hay libros disponibles para alquilar en el género especificado."
-        else:
-            return False, "No hay libros disponibles en el género especificado."
+        libros_disponibles_genero = self.listar_disponibles_por_genero(genero)
+        if libros_disponibles_genero:
+            print(f"Libros disponibles del género '{genero}':")
+            for libro in libros_disponibles_genero:
+                print(libro)
 
+                id_libro = int(input("Ingrese el ID del libro que desea alquilar: "))
+                alquiler_exitoso = self.alquilar_libro(id_libro)
+                if alquiler_exitoso:
+                    print("Libro alquilado con éxito.")
+                    return True
+                else:
+                    print("No se pudo alquilar el libro.")
+                    return False
+            else:
+                print("Operación cancelada.")
+                return False
+        else:
+            print(f"No hay libros disponibles del género '{genero}'.")
+            return False
+    
     def alquilar_libro(self, numero_libro):
         current = self.biblioteca.head
         while current:
@@ -128,15 +161,10 @@ class GestorLibros:
             current = current.next
         return False
 
-    def calcular_descuento(self):
-        total_libros_alquilados = 0
-        current = self.biblioteca.head
-        while current:
-            if not current.value.disponible:
-                total_libros_alquilados += 1
-            current = current.next
-        if total_libros_alquilados >= 2:
-            return 0.1  # Descuento del 10% por libro
+    def calcular_descuento(self, cantidad_libros):
+        if cantidad_libros >= 2:
+            descuento = self.ingreso_total * 0.1
+            return descuento
         else:
             return 0
 

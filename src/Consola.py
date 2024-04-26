@@ -23,11 +23,11 @@ def mostrar_menu():
 def main():
     gestor = GestorLibros()
     
-    libro1 = Libro(1, "Fantasía", "J.R.R. Tolkien", "El señor de los anillos", 1954, 2000)
-    libro2 = Libro(2, "Ciencia ficción", "George Orwell", "1984", 1949, 3200)
-    libro3 = Libro(3, "Realismo mágico", "Gabriel García Márquez", "Cien años de soledad", 1967, 2500)
-    libro4 = Libro(4, "Fantasía", "J.K. Rowling", "Harry Potter y la piedra filosofal", 1997, 1800)
-    libro5 = Libro(5, "Romance", "Jane Austen", "Orgullo y prejuicio", 1813, 1000)
+    libro1 = Libro(1, "Romance", "Jose Luis Díaz", "Los rios profundos el amor", 2015, 2000)
+    libro2 = Libro(2, "Ficción", "Tomás Carrasquilla", "De sobremesa", 1949, 3200)
+    libro3 = Libro(3, "Ficción", "Gabriel García Márquez", "Cien años de soledad", 1967, 2500)
+    libro4 = Libro(4, "História", "Álvaro Cepeda", "La casa grande", 1966, 1800)
+    libro5 = Libro(5, "História", "Arturo Alape", "El bogotazo", 1986, 1000)
     gestor.agregar_libro(libro1)
     gestor.agregar_libro(libro2)
     gestor.agregar_libro(libro3)
@@ -48,7 +48,7 @@ def main():
             tarifa_diaria = float(input("Ingrese la tarifa diaria de alquiler del libro: "))
             libro_nuevo = Libro(numero_libro, genero, autor, titulo, ano_publicacion, tarifa_diaria)
             gestor.agregar_libro(libro_nuevo)
-            print("Libro agregado correctamente")
+            
 
         elif opcion == "2":
             # Eliminar libro
@@ -76,27 +76,39 @@ def main():
             titulo = input("Ingrese el título del libro a buscar: ")
             libro, disponibilidad = gestor.buscar_por_titulo(titulo)
             if libro:
-                print(f"Libro encontrado: {libro} ({disponibilidad})")
+                print(f"Libro encontrado: {libro}")
             else:
                 print("Libro no encontrado.")
 
         elif opcion == "5":
             # Buscar por autor
-            autor = input("Ingrese el autor del libro a buscar: ")
-            libro, disponibilidad = gestor.buscar_por_autor(autor)
-            if libro:
-                print(f"Libro encontrado: {libro} ({disponibilidad})")
+            autor = input("Ingrese el autor de los libros a buscar: ")
+            libros_encontrados = gestor.buscar_por_autor(autor)
+            if libros_encontrados:
+                print("Libros encontrados:")
+                current_node = libros_encontrados.head
+                while current_node:
+                    libro = current_node.value
+                    print(f"{libro} ")
+                    current_node = current_node.next
             else:
-                print("Libro no encontrado.")
+                print("No se encontraron libros del autor especificado.")
 
         elif opcion == "6":
             # Buscar por año de publicación
             ano_publicacion = int(input("Ingrese el año de publicación del libro a buscar: "))
-            libro, disponibilidad = gestor.buscar_por_ano_publicacion(ano_publicacion)
-            if libro:
-                print(f"Libro encontrado: {libro} ({disponibilidad})")
+            libros_encontrados = gestor.buscar_por_ano_publicacion(ano_publicacion)
+            if libros_encontrados:
+                print("Libros encontrados:")
+                current_node = libros_encontrados.head
+                while current_node:
+                    libro = current_node.value
+                    print(f"{libro} ")
+                    current_node = current_node.next
             else:
-                print("Libro no encontrado.")
+                print("No se encontraron libros publicados en el año especificado.")
+
+
 
         elif opcion == "7":
             # Listar libros disponibles
@@ -131,22 +143,8 @@ def main():
         elif opcion == "11":
             #Alquilar libro por género
             genero = input("Ingrese el género del libro a listar: ")
-            libros_disponibles_genero = gestor.listar_disponibles_por_genero(genero)
-            if libros_disponibles_genero:
-                print(f"Libros disponibles del género '{genero}':")
-                for libro in libros_disponibles_genero:
-                    print(libro)
-                
-                # Preguntar al usuario si desea alquilar un libro
-                respuesta = input("¿Desea alquilar alguno de estos libros? (s/n): ")
-                if respuesta.lower() == 's':
-                    id_libro = int(input("Ingrese el ID del libro que desea alquilar: "))
-                    if gestor.alquilar_libro(id_libro):
-                        print("Libro alquilado con éxito.")
-                    else:
-                        print("No se pudo alquilar el libro. Verifique el ID ingresado.")
-            else:
-                print(f"No hay libros disponibles del género '{genero}'.")
+            gestor.alquilar_libro_por_genero(genero)
+
 
         elif opcion == "12":
             # Alquilar libro
@@ -167,8 +165,8 @@ def main():
         elif opcion == "14":
             # Calcular descuento
             cantidad_libros_alquilados = int(input("Ingrese la cantidad de libros alquilados por el usuario: "))
-            descuento = gestor.calcular_descuento()
-            print(f"Descuento aplicable: {descuento * 100}%")
+            descuento = gestor.calcular_descuento(cantidad_libros_alquilados)
+            print(f"Tiene un descuento de {descuento} pesos")
 
         elif opcion == "15":
             # Calcular ingresos totales
@@ -188,7 +186,7 @@ def main():
                 current = current.next
 
             if libro_a_intercambiar:
-                # Solicitar al usuario la información del nuevo libro
+                
                 print("Ingrese la información del nuevo libro:")
                 id_libro_nuevo = input("Nuevo Id: ")
                 genero = input("Género: ")
@@ -197,10 +195,9 @@ def main():
                 ano_publicacion = int(input("Año de Publicación: "))
                 tarifa_diaria = float(input("Tarifa Diaria de Alquiler: "))
 
-                # Crear un nuevo libro con la información proporcionada por el usuario
                 nuevo_libro = Libro(id_libro_nuevo, genero, autor, titulo, ano_publicacion, tarifa_diaria)
 
-                # Llamar al método intercambiar_libro_deteriorado
+
                 if gestor.intercambiar_libro_deteriorado(id_libro, nuevo_libro):
                     print("Intercambio realizado con éxito.")
                 else:
@@ -208,7 +205,6 @@ def main():
             else:
                 print("No se encontró ningún libro con el ID especificado.")
 
-            # Imprimir los libros disponibles después del intercambio
             print("\nLibros disponibles después del intercambio:")
             for libro in gestor.biblioteca:
                 print(libro.value)
